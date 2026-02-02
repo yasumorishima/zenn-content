@@ -3,7 +3,7 @@ title: "OSSにPRを出す前に入れておきたい無料コード品質ツー�
 emoji: "🔍"
 type: "tech"
 topics: ["oss", "github", "coderabbit", "sonarcloud", "claudecode"]
-published: false
+published: true
 ---
 
 ## はじめに
