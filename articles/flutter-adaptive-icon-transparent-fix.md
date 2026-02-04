@@ -66,8 +66,13 @@ Flutterプロジェクトのデフォルト構成では、`flutter create`時に
 | v1.0.9 | `ic_launcher_round.png`を全密度フォルダに追加 | 変わらず |
 | v1.0.10 | background XMLを`@color/`から`@drawable/`(gradient shape)に変更 | 変わらず |
 | v1.0.11 | `mipmap-anydpi-v26`フォルダごと削除（PNGフォールバック） | アイコンは出るが白背景+小さい四角 |
+| v1.0.12 | foreground PNGを1.6倍に拡大＋adaptive icon XML復活 | 本が大きすぎ＋背景グレーに悪化 |
 
 v1.0.11でPNGフォールバックにしたことでアイコン自体は表示されるようになったが、Androidのランチャーが丸いマスクを適用するため、四角いPNGアイコンが白い円の中に小さく表示される見栄えの悪い結果になった。
+
+v1.0.12ではforeground PNGを用意したが、**2つの問題**があった：
+1. foreground PNGの背景が**不透明なグレー**だった → backgroundレイヤーの紫グラデーションが完全に隠れた
+2. アイコンをキャンバスの100%まで拡大した → 大きすぎて見栄えが悪い
 
 ## 解決法
 
@@ -83,7 +88,12 @@ v1.0.11でPNGフォールバックにしたことでアイコン自体は表示�
 | xxhdpi | 324x324 |
 | xxxhdpi | 432x432 |
 
-foreground画像は**透明背景**に**アイコン本体のみ**を配置する。アイコンはキャンバスの中央に大きめに配置すること。adaptive iconのsafe zoneは全体の約66%（内側72dp / 全体108dp）なので、重要な部分はキャンバスの中央66%に収める。
+foreground画像は以下の要件を満たすこと：
+
+- **背景は完全に透明（alpha=0）にする**。不透明な背景があるとbackgroundレイヤー（グラデーション等）が完全に隠れてしまう
+- アイコン本体は**キャンバスの約48〜50%のサイズ**で中央に配置する
+- adaptive iconのsafe zoneは全体の約61%（内側66dp / 全体108dp）。重要な部分はこの範囲に収める
+- 大きすぎると背景が見えなくなり、小さすぎると丸いマスク内で縮小表示される
 
 ### 2. background画像/XMLを用意する
 
@@ -145,9 +155,12 @@ adaptive iconのトラブルに遭遇したら、以下を確認する：
 
 - [ ] `mipmap-anydpi-v26/ic_launcher.xml`が存在するか
 - [ ] XMLの`@drawable/ic_launcher_foreground`が参照するPNGが**全密度の`drawable-*`フォルダ**に存在するか
-- [ ] foreground画像のアイコン部分がキャンバスの中央66%に収まっているか
-- [ ] foreground画像のアイコンが十分に大きいか（小さいと丸いマスク内で縮小表示される）
+- [ ] foreground画像の**背景が透明（alpha=0）か**（不透明だとbackgroundレイヤーが隠れる）
+- [ ] foreground画像のアイコンが**キャンバスの約48〜50%**のサイズか（大きすぎても小さすぎてもダメ）
+- [ ] foreground画像のアイコン部分がキャンバスの中央61%（safe zone: 66dp/108dp）に収まっているか
 
 ## まとめ
 
-Flutterアプリのアイコンが透明になる原因は、**adaptive icon XMLが参照するforeground画像が存在しない**ことだった。Play Storeでは正常に見えるため発見が遅れやすい。`mipmap-anydpi-v26`のXMLと`drawable-*`のforeground PNGの対応関係を確認することが重要。
+Flutterアプリのアイコンが透明になる原因は、**adaptive icon XMLが参照するforeground画像が存在しない**ことだった。Play Storeでは正常に見えるため発見が遅れやすい。
+
+さらに、foreground画像が存在していても**背景が不透明だとbackgroundレイヤーが隠れる**、**アイコンが大きすぎると背景が見えなくなる**といった落とし穴がある。foreground PNGは「透明背景＋キャンバスの約48〜50%サイズ」を守ることが重要。
