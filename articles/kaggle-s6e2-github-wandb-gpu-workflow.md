@@ -381,6 +381,4 @@ Kaggle Secretsに `WANDB_API_KEY` を設定していない場合に発生しま�
 
 ---
 
-**ノートブック**: https://www.kaggle.com/competitions/playground-series-s6e2/code
-
-参考になった方は、KaggleノートブックのUpvoteもいただけると嬉しいです！
+参考になれば幸いです。
