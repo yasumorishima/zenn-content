@@ -381,4 +381,6 @@ Kaggle Secretsに `WANDB_API_KEY` を設定していない場合に発生しま�
 
 ---
 
+**ノートブック**: https://www.kaggle.com/code/yasunorim/s6e2-heart-disease-eda-ensemble-wandb
+
 参考になれば幸いです。
