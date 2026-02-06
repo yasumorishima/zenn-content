@@ -163,8 +163,7 @@ kaggle competitions submissions で LB スコア確認
 2. 右サイドバーの **「Add-ons」→「Secrets」**
 3. **Label**: `WANDB_API_KEY`、**Value**: コピーしたAPIキー
 
-![Kaggle Secrets設定](/images/kaggle-secrets-location.png)
-*Kaggle Web UIの「Add-ons > Secrets」からAPIキーを設定*
+*Kaggle Web UIの「Add-ons > Secrets」からAPIキーを設定します*
 
 #### Step 3: ノートブックでのログインコード
 
