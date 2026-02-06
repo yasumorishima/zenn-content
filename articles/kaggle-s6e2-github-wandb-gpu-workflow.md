@@ -39,7 +39,7 @@ Kaggleコンペに初めて本格参加する方や、GitHub連携・W&B・GPU�
 
 ノートブックはこちら:
 
-https://www.kaggle.com/code/yasunorim/s6e2-heart-disease-eda-ensemble-wandb
+https://www.kaggle.com/competitions/playground-series-s6e2/code
 
 ---
 
@@ -71,9 +71,9 @@ Kaggleの「Settings」→「API」→「Create New Token」で `kaggle.json` �
 
 ```json
 {
-  "id": "yasunorim/s6e2-heart-disease-eda-ensemble-wandb",
-  "title": "S6E2 Heart Disease EDA Ensemble WandB",
-  "code_file": "s6e2-heart-disease-baseline.ipynb",
+  "id": "your-username/your-notebook-slug",
+  "title": "Your Notebook Title",
+  "code_file": "your-notebook.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": "false",
@@ -110,7 +110,7 @@ kaggle kernels output ユーザー名/slug -p ./output
 # 提出
 kaggle competitions submit -c playground-series-s6e2 \
   -f ./output/submission.csv \
-  -m "v4: ensemble CV AUC 0.95528"
+  -m "v4: ensemble CV AUC 0.955"
 ```
 
 ### 運用フロー
@@ -381,6 +381,6 @@ Kaggle Secretsに `WANDB_API_KEY` を設定していない場合に発生しま�
 
 ---
 
-**ノートブック**: https://www.kaggle.com/code/yasunorim/s6e2-heart-disease-eda-ensemble-wandb
+**ノートブック**: https://www.kaggle.com/competitions/playground-series-s6e2/code
 
 参考になった方は、KaggleノートブックのUpvoteもいただけると嬉しいです！
