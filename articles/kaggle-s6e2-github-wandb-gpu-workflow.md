@@ -39,7 +39,7 @@ Kaggleコンペに初めて本格参加する方や、GitHub連携・W&B・GPU�
 
 ノートブックはこちら:
 
-https://www.kaggle.com/competitions/playground-series-s6e2/code
+https://www.kaggle.com/code/yasunorim/s6e2-heart-disease-eda-ensemble-wandb
 
 ---
 
@@ -216,6 +216,8 @@ wandb_end()
 
 - `enable_internet: "true"` が必須（W&Bはインターネット接続が必要）
 - Kaggle Secretsは**ノートブックごと**に設定が必要
+- **`kaggle kernels push`（CLI push）するとSecretsの紐付けがリセットされる**。push後はWeb UIで再度Secret ONにしてからRunする必要がある
+- Kaggle標準のwandbは古いため、**`!pip install -q --upgrade wandb`** をノートブック冒頭に追加しておく（新形式APIキー `wandb_v1_...` に対応するため）
 - W&Bの無料プランで個人利用は十分
 
 ---
