@@ -125,6 +125,14 @@ kaggle datasets create -p japanese-mlb-players-statcast/
 kaggle datasets version -p japanese-mlb-players-statcast/ -m "Add new player data"
 ```
 
+:::message
+**ローカルフォルダ名とdataset slugの違い**
+
+`-p` オプションにはローカルフォルダパス（`japanese-mlb-players-statcast/`）を指定しますが、Kaggle上でのdataset slugは `dataset-metadata.json` の `id` で決まります（`japan-mlb-pitchers-batters-statcast`）。
+
+削除→再作成時は旧slugが再利用不可のため、新しいslugを使う必要があります。
+:::
+
 ### 3. Description・カバー画像の設定
 
 Kaggle UIでSubtitle（80文字以内）、Description（Markdown）、カバー画像を設定します。
@@ -174,7 +182,61 @@ Kaggle UIでSubtitle（80文字以内）、Description（Markdown）、カバー
 
 ---
 
-## 💡 使用例
+## 🔧 Kaggleノートブックでの使い方
+
+本データセットをKaggleノートブックで使用する場合、以下の手順で読み込みます。
+
+### 1. kernel-metadata.jsonでデータセットを指定
+
+ノートブックのメタデータファイル（`kernel-metadata.json`）に `dataset_sources` を追加します。
+
+```json
+{
+  "id": "your-username/your-notebook-slug",
+  "title": "Your Notebook Title",
+  "code_file": "your-notebook.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "false",
+  "enable_gpu": "false",
+  "enable_tpu": "false",
+  "enable_internet": "false",
+  "dataset_sources": ["yasunorim/japan-mlb-pitchers-batters-statcast"],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
+```
+
+### 2. Kaggle CLIでノートブックをpush
+
+```bash
+PYTHONUTF8=1 kaggle kernels push -p .
+```
+
+### 3. ノートブック内でデータを読み込み
+
+Kaggleノートブック実行時、データセットは `/kaggle/input/<dataset-slug>/` にマウントされます。
+
+```python
+import pandas as pd
+
+# 投球データ
+df_pitching = pd.read_csv('/kaggle/input/japan-mlb-pitchers-batters-statcast/japanese_mlb_pitching.csv')
+
+# 打撃データ
+df_batting = pd.read_csv('/kaggle/input/japan-mlb-pitchers-batters-statcast/japanese_mlb_batting.csv')
+
+# 選手メタデータ
+df_players = pd.read_csv('/kaggle/input/japan-mlb-pitchers-batters-statcast/players.csv')
+
+print(f'投球データ: {len(df_pitching)} records')
+print(f'打撃データ: {len(df_batting)} records')
+```
+
+---
+
+## 💡 ローカルでの使用例
 
 ### DuckDBでSQLクエリ
 
