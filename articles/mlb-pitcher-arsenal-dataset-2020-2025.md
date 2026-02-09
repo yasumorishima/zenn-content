@@ -4,7 +4,7 @@ emoji: "⚾"
 type: "tech"
 topics: ["kaggle", "baseball", "mlb", "python", "データ分析"]
 published: true
-published_at: 2026-02-09 12:00
+published_at: 2026-02-09 12:30
 ---
 
 # はじめに
