@@ -1,5 +1,5 @@
 ---
-title: "MLB投手の球種構成データセット（2020-2025）をKaggleに公開しました"
+title: "MLB投手の球種構成データセット（2020-2025）をKaggleに公開した話"
 emoji: "⚾"
 type: "tech"
 topics: ["kaggle", "baseball", "mlb", "python", "データ分析"]
