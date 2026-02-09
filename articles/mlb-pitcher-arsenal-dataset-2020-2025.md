@@ -97,7 +97,7 @@ kikuchi = df[df['player_name'].str.contains('Kikuchi', case=False)]
 kikuchi.plot(x='season', y=['SL_usage_pct', 'FF_usage_pct', 'CH_usage_pct'])
 ```
 
-菊池投手の場合、スライダー使用率が2019年の約20%から2022-2025年には40%以上に増加していることが分かります（「スライダー革命」）。
+菊池投手の場合、スライダー使用率が2019年の約20%から2022-2025年には40%以上に増加している様子が見られます。
 
 ### 2. 怪我前後の変化検出
 
