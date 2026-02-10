@@ -45,9 +45,6 @@ Flutterはほとんど初めてでしたが、Claude Codeに「こういうア�
 ところがClaude Codeと一緒にコードを読むと、「ここのエラーメッセージが不親切だな」「この処理、将来的に非推奨になるやつだ」という箇所が見えてくるようになりました。修正内容をClaude Codeと確認しながらPRを出す、というサイクルを繰り返したところ、以下のような実績になりました。
 
 - **team-mirai-volunteer/action-board**: 11 Merged（バグ修正、リファクタリング、テスト追加など）
-- **pybaseball**（MLB分析Pythonライブラリ）: [PR #498〜#504](https://github.com/jldbc/pybaseball/pulls?q=is%3Apr+author%3Ayasumorishima) 7件提出
-- **dfinity/icp-js-core**: [PR #1270](https://github.com/dfinity/icp-js-core/pull/1270) エラーメッセージ改善
-- **line/line-bot-mcp-server**: [PR #369](https://github.com/line/line-bot-mcp-server/pull/369) フォロワーID取得ツール追加
 
 「どこを直せばいいか探す」「修正内容が適切か確認する」「PRの文章を書く」、これらをClaude Codeと一緒に行いました。私が判断して、Claude Codeが実装を手伝う、という分担です。
 
@@ -55,7 +52,7 @@ Flutterはほとんど初めてでしたが、Claude Codeに「こういうア�
 
 ### 3. Kaggleにデータセットを4本公開した
 
-野球（MLB）のデータを扱うKaggleデータセットを4本作成・公開しました。すべて品質スコア10.0/10を達成しています。
+野球（MLB）のデータを扱うKaggleデータセットを4本作成・公開しました。
 
 - Dataset 1: Japanese MLB Players Statcast (2015-2025)
 - Dataset 2: MLB Bat Tracking (2024-2025)
