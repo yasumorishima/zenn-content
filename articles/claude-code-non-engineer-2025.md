@@ -54,10 +54,10 @@ Flutterはほとんど初めてでしたが、Claude Codeに「こういうア�
 
 野球（MLB）のデータを扱うKaggleデータセットを4本作成・公開しました。
 
-- Dataset 1: Japanese MLB Players Statcast (2015-2025)
-- Dataset 2: MLB Bat Tracking (2024-2025)
-- Dataset 3: MLB Pitcher Arsenal Evolution (2020-2025)
-- Dataset 4: MLB Statcast + Bat Tracking (2024-2025)（約144万行）
+- [Dataset 1: Japanese MLB Players Statcast (2015-2025)](https://www.kaggle.com/datasets/yasunorim/japan-mlb-pitchers-batters-statcast)
+- [Dataset 2: MLB Bat Tracking (2024-2025)](https://www.kaggle.com/datasets/yasunorim/mlb-bat-tracking-2024-2025)
+- [Dataset 3: MLB Pitcher Arsenal Evolution (2020-2025)](https://www.kaggle.com/datasets/yasunorim/mlb-pitcher-arsenal-2020-2025)
+- [Dataset 4: MLB Statcast + Bat Tracking (2024-2025)](https://www.kaggle.com/datasets/yasunorim/mlb-statcast-bat-tracking-2024-2025)（約144万行）
 
 データ取得スクリプト、Column Descriptionの一括入力スクリプト、分析ノートブック、ブログ記事まで、Claude Codeとセットで進めました。
 
