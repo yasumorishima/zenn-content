@@ -3,7 +3,7 @@ title: "pybaseballにない「日付範囲指定」を可能にするライブ�
 emoji: "⚾"
 type: "tech"
 topics: ["python", "pypi", "baseball", "mlb", "pybaseball"]
-published: false
+published: true
 ---
 
 ## はじめに
