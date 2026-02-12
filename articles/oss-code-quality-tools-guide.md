@@ -70,7 +70,7 @@ upstream/main ← PR（チェック済みのコードを提出）
 
 ## 実際に使ってみて
 
-自分はチームみらいのOSSに19件のPRを出してきた。upstreamにCodeRabbitが入っていたおかげで、以下のような指摘をもらえた。
+チームみらいのOSSにPRを出した際、upstreamにCodeRabbitが入っていたため、PR提出後に以下のような指摘をもらった。フォーク側でbot チェックをしておけば、upstreamに出す前に自分で潰せていた例だ。
 
 **catchブロックのfail-open問題**
 
