@@ -53,6 +53,19 @@ upstream/main ← PR（チェック済みのコードを提出）
 
 これだけで、フォーク上のPRにCodeRabbitが自動でレビューコメントを付けるようになる。
 
+#### ⚠️ Draft PR はデフォルトでスキップされる
+
+CodeRabbitはデフォルト設定ではDraft PRをレビューしない。フォーク内でDraft PRを使う場合は、リポジトリルートに `.coderabbit.yaml` を置いて有効化する必要がある。
+
+```yaml
+# .coderabbit.yaml（フォークのデフォルトブランチに置く）
+reviews:
+  auto_review:
+    drafts: true
+```
+
+または、PRコメントで `@coderabbitai review` と書けばDraft状態でも手動トリガーできる。
+
 #### 便利なコマンド
 
 - `@coderabbitai review` — PRコメントに書くと再レビュー
