@@ -1,5 +1,5 @@
 ---
-title: "完全無料で野球情報を自動ツイートするbotをラズパイで作った話"
+title: "OpenClaw入門：ラズパイ × Geminiで自動ツイートbot"
 emoji: "⚾"
 type: "tech"
 topics: ["raspberrypi", "twitter", "gemini", "bot", "openclaw"]
