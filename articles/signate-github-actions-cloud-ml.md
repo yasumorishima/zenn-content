@@ -337,9 +337,15 @@ git push → GitHub Actions → データDL → 学習 → 提出
 
 ---
 
+## 関連記事
+
+この記事の手順をCLIで自動化するツールを作りました：
+- [SIGNATEコンペの提出をCLIで自動化する：signate-deploy を作った](https://zenn.dev/shogaku/articles/signate-deploy-cli-introduction)
+
 ## 参考リンク
 
 - [SIGNATE CLI（PyPI）](https://pypi.org/project/signate/)
+- [signate-deploy（PyPI）](https://pypi.org/project/signate-deploy/) — 本記事の手順をCLIで自動化
 - [SIGNATE CLI でデータセットをダウンロードする（Qiita）](https://qiita.com/john-rocky/items/dd2b7f4cd8e655a5376b)
 - [SIGNATE CLIを使うための準備（Zenn）](https://zenn.dev/kawacdev/articles/ea5fd29441012e)
 - [GitHub Actions ドキュメント](https://docs.github.com/ja/actions)
