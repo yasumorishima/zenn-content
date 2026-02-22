@@ -82,7 +82,7 @@ plt.show()
 
 WBC 2026出場選手（18カ国）の2024〜2025 MLBレギュラーシーズンStatcastデータを使ったKaggleノートブックを公開しています。WBCの試合データではなく、**WBCロスター選手のMLBでの打球データ**です。
 
-> **Kaggle Notebook**: https://www.kaggle.com/code/yasunorim/wbc-2026-spray-charts-with-baseball-field-viz
+> **Kaggle Notebook**: https://www.kaggle.com/code/yasunorim/mlb-statcast-spray-charts-for-wbc-2026-players
 
 ### 全18カ国のスプレーチャート
 
