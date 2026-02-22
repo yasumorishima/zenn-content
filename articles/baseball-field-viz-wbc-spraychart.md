@@ -1,5 +1,5 @@
 ---
-title: "WBCデータで野球場スプレーチャートを描く：baseball-field-viz を作った"
+title: "WBC出場選手のStatcastデータでスプレーチャートを描く：baseball-field-viz を作った"
 emoji: "⚾"
 type: "tech"
 topics: [python, baseball, matplotlib, pypi, statcast]
@@ -78,9 +78,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-## WBC 2026 データで試す
+## WBC 2026 出場選手のStatcastデータで試す
 
-WBC 2026スカウティング用に作成したKaggleデータセット（全18カ国・MLB Statcastデータ）でこのライブラリを使ったノートブックを公開しています。
+WBC 2026出場選手（18カ国）の2024〜2025 MLBレギュラーシーズンStatcastデータを使ったKaggleノートブックを公開しています。WBCの試合データではなく、**WBCロスター選手のMLBでの打球データ**です。
 
 > **Kaggle Notebook**: https://www.kaggle.com/code/yasunorim/wbc-2026-spray-charts-with-baseball-field-viz
 
