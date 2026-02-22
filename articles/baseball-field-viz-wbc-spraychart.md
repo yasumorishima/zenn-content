@@ -116,6 +116,32 @@ pip install baseball-field-viz
 
 依存パッケージ：`matplotlib>=3.5` / `numpy>=1.21` / `pandas>=1.3`
 
+## v0.2.0 追加機能：ストライクゾーン描画
+
+v0.2.0 では、ストライクゾーン描画に対応しました。
+
+```python
+from baseball_field_viz import draw_strike_zone, pitch_zone_chart
+```
+
+| 関数 | 説明 |
+|---|---|
+| `draw_strike_zone(ax, sz_top=3.5, sz_bot=1.5)` | ストライクゾーン矩形を描画（plate_x/plate_z座標系） |
+| `pitch_zone_chart(ax, df, color_by='pitch_type')` | 投球位置プロット + ゾーン自動サイズ |
+
+Statcastの `sz_top`/`sz_bot` は身長から計算した固定値ではなく、**投球ごとにHawk-Eyeで実測した値**なので精度が高いです。DataFrameに含まれている場合は平均値を自動で使用します。
+
+```python
+from pybaseball import statcast_pitcher
+from baseball_field_viz import pitch_zone_chart
+
+df = statcast_pitcher('2025-03-01', '2025-10-31', 592789)  # 山本由伸
+
+fig, ax = plt.subplots(figsize=(6, 6))
+pitch_zone_chart(ax, df, color_by='pitch_type', title='Yamamoto 2025')
+plt.show()
+```
+
 ## savant-extrasとの組み合わせ
 
 同じく自作の[savant-extras](https://github.com/yasumorishima/savant-extras)（バットトラッキングデータ取得ライブラリ）と組み合わせると、データ取得から可視化まで一貫したMLB分析パイプラインが構築できます。
