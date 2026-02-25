@@ -2,7 +2,7 @@
 title: "Driveline C3Dデータで投球・打撃の3D骨格検知をやってみた"
 emoji: "🦴"
 type: "tech"
-topics: [python, baseball, matplotlib, データ分析, 機械学習]
+topics: ["python", "baseball", "データ分析", "機械学習", "oss"]
 published: true
 ---
 
