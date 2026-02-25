@@ -52,13 +52,13 @@ labels = c3d["parameters"]["POINT"]["LABELS"]["value"]
 
 ### 投球フォームの骨格アニメーション
 
-![投球骨格アニメーション](/images/baseball-cv-pitching-anim.gif)
+![投球骨格アニメーション](https://raw.githubusercontent.com/yasumorishima/baseball-cv/master/data/output/skeleton_pitching_anim.gif)
 
 45個のマーカーを結んで骨格として描画しています。ワインドアップからリリースまでの一連の動きが見えます。
 
 ### 打撃フォームの骨格
 
-![打撃骨格](/images/baseball-cv-hitting-anim.gif)
+![打撃骨格](https://raw.githubusercontent.com/yasumorishima/baseball-cv/master/data/output/skeleton_hitting_anim.gif)
 
 打撃側は55マーカーで、バットの10マーカーは赤色で表示しています。
 
