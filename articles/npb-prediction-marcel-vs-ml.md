@@ -40,9 +40,7 @@ published: true
 | 生年月日 | 2,479人 |
 | 詳細打撃成績 | 4,538行（npb.jp） |
 
-:::message
-データの利用にあたり、提供元（baseball-data.com、npb.jp）へのクレジット表記を徹底しています。生データの再配布はしていません。
-:::
+データの提供元：[プロ野球データFreak](https://baseball-data.com)、[NPB公式サイト](https://npb.jp)
 
 ---
 
