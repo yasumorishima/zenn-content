@@ -2,7 +2,7 @@
 title: "Marcel法がLightGBMを上回った話 — NPB選手成績予測システムを作った"
 emoji: "⚾"
 type: "tech"
-topics: [python, baseball, machinelearning, datascience, fastapi]
+topics: [python, baseball, machinelearning, データ分析, fastapi]
 published: true
 ---
 
