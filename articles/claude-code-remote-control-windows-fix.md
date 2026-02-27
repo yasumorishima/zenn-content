@@ -1,5 +1,5 @@
 ---
-title: "Claude Code の remote-control が Windows で Workspace not trusted になる場合の対処法"
+title: "Claude Code remote-control が Windows で Workspace not trusted になる対処法"
 emoji: "📱"
 type: "tech"
 topics: ["claudecode", "claude", "windows", "ai"]
