@@ -4,7 +4,6 @@ emoji: "📱"
 type: "tech"
 topics: ["claudecode", "claude", "windows", "ai"]
 published: true
-published_at: "2026-02-27 21:43"
 ---
 
 ## はじめに
