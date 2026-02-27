@@ -14,6 +14,12 @@ WBC 2026（ワールドベースボールクラシック）に向けて、MLBの
 2. **Kaggle データセット** — 20カ国・54万投球以上のStatcastデータ
 3. **Kaggle EDA ノートブック** — 国別ファストボール球速などの分析
 
+## 🌐 ランディングページ
+
+**[https://wbc-2026-scouting-dashboard-zvg.caffeine.xyz/](https://wbc-2026-scouting-dashboard-zvg.caffeine.xyz/)**
+
+全チームのダッシュボードリンクをプール別にまとめたランディングページ（ICP / Caffeine 上でホスト、英語・日本語対応）。
+
 ---
 
 ## 1. スカウティングダッシュボード
