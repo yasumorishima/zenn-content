@@ -240,6 +240,17 @@ Marcel法は2024年の不振に引っ張られ、OPS .656と低めに予測。�
 
 Docker対応もしており、`docker compose up --build` で一発起動できます。
 
+### Raspberry Pi + Tailscale Funnelで外部公開
+
+ローカルで動かすだけでなく、Raspberry Pi 5にDockerごとデプロイして常時稼働させています。さらに**Tailscale Funnel**を使ってインターネットに公開しました。
+
+```bash
+# RPiでFunnelを有効化（1コマンドで完了）
+sudo tailscale funnel --bg 8000
+```
+
+これだけで固定のHTTPS URLが発行され、外部からSwagger UIを操作できます。VPNサービスのTailscaleが証明書管理・ポートフォワード・NAT越えをすべて肩代わりしてくれるため、ルーター設定なしで公開できるのが手軽でした。
+
 ### チーム編成シミュレーション
 
 v0.3.0で `/simulate/team/{team}` エンドポイントを追加しました。選手を入れ替えて勝数の変化をシミュレーションできます。
