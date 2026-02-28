@@ -146,6 +146,49 @@ ModuleNotFoundError
 
 ---
 
+## 後から追加したこと
+
+### モバイル対応
+
+スマホで見たときにサイドバーが開きっぱなしで邪魔だったので対応しました。
+
+```python
+st.set_page_config(
+    ...,
+    initial_sidebar_state="collapsed",  # スマホでは最初から閉じておく
+)
+
+st.markdown("""
+<style>
+@media (max-width: 768px) {
+    .block-container { padding: 1rem 0.5rem !important; }
+    [data-testid="column"] { min-width: 45% !important; flex: 1 1 45% !important; }
+    [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; }
+}
+</style>
+""", unsafe_allow_html=True)
+```
+
+あわせて `st.pyplot(fig, use_container_width=True)` を全グラフに追加しています。これがないとグラフがコンテナ幅に合わせてリサイズされないため、スマホでははみ出します。
+
+### 初回アクセス時の自動ロード
+
+最初は「サイドバーを開く → Load Dataボタンを押す」という手順が必要でしたが、面倒なので初回アクセス時は自動でデータを取得するよう変更しました。
+
+```python
+# Before: ボタンを押したときだけ読み込む
+if load_btn:
+    ...
+
+# After: 初回アクセス時も自動で読み込む
+if load_btn or "df_raw" not in st.session_state:
+    ...
+```
+
+`@st.cache_data` のおかげで、一度読み込んだあとはキャッシュから返されるため、タブ切り替えやフィルタ操作のたびに待たされることはありません。
+
+---
+
 ## まとめ
 
 - **savant-extras**（自作ライブラリ）でデータ取得
