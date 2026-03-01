@@ -12,7 +12,7 @@ NPB（日本プロ野球）の選手成績予測プロジェクトを作って�
 
 → 前回記事: [Marcel法がLightGBMを上回った話](https://zenn.dev/shogaku/articles/npb-prediction-marcel-vs-ml)
 
-ひととおり動くようになって気づいたのですが、毎年11月に手動で `python ml_projection.py` を実行する運用になっていました。
+ひととおり動くようになって気づいたのですが、毎年3月（開幕前）に手動で `python ml_projection.py` を実行する運用になっていました。
 
 これだと以下が全部手動です：
 
@@ -31,7 +31,7 @@ GitHub Actionsで自動化して、モデル保存と精度記録も追加しま
 |---|---|
 | **モデル保存** | `joblib` で `.pkl` に保存 → `data/models/` に年度ごとに置く |
 | **精度記録** | Marcel vs ML の MAE を JSON に保存 + FastAPI で `/metrics` エンドポイント |
-| **自動実行** | GitHub Actions で毎年11月1日に自動実行 |
+| **自動実行** | GitHub Actions で毎年3月1日に自動実行（FA・移籍確定後） |
 
 順番に説明します。
 
@@ -146,7 +146,7 @@ name: Annual NPB Update
 
 on:
   schedule:
-    - cron: '0 9 1 11 *'   # 毎年11月1日 9:00 UTC（シーズン終了後）
+    - cron: '0 9 1 3 *'   # 毎年3月1日 9:00 UTC（FA・移籍確定後、開幕前）
   workflow_dispatch:         # 手動実行も可
     inputs:
       data_end_year:
@@ -292,8 +292,7 @@ permissions:
 | `ml_projection.py` | `joblib` でモデル保存、精度を `metrics_*.json` に出力 |
 | `api.py` | `/metrics` エンドポイント追加 |
 | `requirements.txt` | `joblib>=1.3` 追加 |
-| `.github/workflows/annual_update.yml` | 新規作成（7ステップパイプライン）|
-| `.github/workflows/roster_update.yml` | 毎年3月1日に実行（FA・移籍確定後に選手名鑑を更新） |
+| `.github/workflows/annual_update.yml` | 新規作成（8ステップ、毎年3月1日実行）|
 | `fetch_rosters.py` | NPB支配下登録選手一覧を取得（Marcel予測から退団・MLB移籍選手を除外するため） |
 
 実行すると `data/` 以下に以下のファイルが生成され、そのままGitにコミットされます：
