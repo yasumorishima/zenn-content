@@ -174,6 +174,9 @@ jobs:
       - name: 2. Fetch detailed batting stats
         run: python fetch_npb_detailed.py
 
+      - name: 2b. Fetch NPB registered player roster (Marcel filter)
+        run: python fetch_rosters.py
+
       - name: 3. Fetch standings + Pythagorean
         run: python pythagorean.py
 
@@ -292,7 +295,8 @@ permissions:
 | `ml_projection.py` | `joblib` でモデル保存、精度を `metrics_*.json` に出力 |
 | `api.py` | `/metrics` エンドポイント追加 |
 | `requirements.txt` | `joblib>=1.3` 追加 |
-| `.github/workflows/annual_update.yml` | 新規作成（7ステップパイプライン） |
+| `.github/workflows/annual_update.yml` | 新規作成（8ステップパイプライン）|
+| `fetch_rosters.py` | NPB支配下登録選手一覧を取得（Marcel予測から退団・MLB移籍選手を除外するため） |
 
 実行すると `data/` 以下に以下のファイルが生成され、そのままGitにコミットされます：
 

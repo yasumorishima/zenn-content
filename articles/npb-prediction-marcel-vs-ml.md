@@ -43,6 +43,7 @@ published: true
 | 順位表 | 132行（12球団×11年） |
 | 生年月日 | 2,479人 |
 | 詳細打撃成績 | 4,538行（npb.jp） |
+| 支配下登録選手名鑑 | 7,866行（2018-2025、Marcel予測フィルタ用） |
 
 データの提供元：[プロ野球データFreak](https://baseball-data.com)、[NPB公式サイト](https://npb.jp)
 
@@ -77,6 +78,20 @@ predicted = (1 - regression) * weighted + regression * league_avg
 ```python
 age_factor = 1.0 + (27 - age) * 0.003  # 27歳でピーク
 ```
+
+### ステップ4: 選手名鑑フィルタ（退団・MLB移籍選手の除外）
+
+Marcel法はロースターに登録された選手を予測対象とします。しかし前年まで活躍していた選手がオフにMLB移籍・退団・引退した場合、そのままでは予測に「幽霊選手」として残ってしまいます。
+
+これを防ぐため、baseball-data.comの年別支配下登録選手一覧（`fetch_rosters.py`で取得）を使い、**その年のNPBに在籍していない選手を予測から除外**しています。
+
+```python
+roster_names = set(df_roster[df_roster["year"] == target_year]["player"])
+mh = mh[mh["player"].isin(roster_names)]  # 名鑑外の打者を除外
+mp = mp[mp["player"].isin(roster_names)]  # 名鑑外の投手を除外
+```
+
+この処理により、例えば2021年の予測では秋山翔吾・筒香嘉智・菊池雄星（いずれもMLB移籍）が正しく除外され、各チームの予測精度が改善されます。
 
 ---
 
