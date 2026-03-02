@@ -100,7 +100,7 @@ pose = mp_pose.Pose(
 
 ### 角速度の時系列（投球）
 
-![関節角速度の時系列](/images/baseball-cv-kinematic-pitching.png)
+![関節角速度の時系列](https://raw.githubusercontent.com/yasumorishima/baseball-cv/master/data/output/kinematic_sequence_pitching.png)
 
 各関節が1秒間に何度回転しているか（角速度）をフレームごとにプロットしたものです。投球のどの瞬間に、どの関節が特に速く動いているかが一目で分かります。
 
@@ -114,9 +114,9 @@ Driveline OBPのC3Dデータには、ファイル名に球速情報が含まれ�
 
 ### 相関結果
 
-![相関散布図](/images/baseball-cv-scatter.png)
+![相関散布図](https://raw.githubusercontent.com/yasumorishima/baseball-cv/master/data/output/scatter_pitching.png)
 
-![相関行列](/images/baseball-cv-correlation.png)
+![相関行列](https://raw.githubusercontent.com/yasumorishima/baseball-cv/master/data/output/correlation_pitching.png)
 
 | 指標 | 相関（r） | p値 |
 |---|---|---|
