@@ -152,6 +152,41 @@ python -m signate_deploy file-list --task-key <task_key>
 
 `submit` と `download` は `gh workflow run` 経由で実行されます。ローカルで直接SIGNATEに提出するわけではないので、事前にGitHubリポジトリとの連携が必要です。
 
+### gh secret set はリポのディレクトリ内で実行する
+
+`gh secret set` はカレントディレクトリがgitリポジトリでないと失敗します。必ずリポジトリのルートで実行してください。
+
+```bash
+cd my-competition   # gitリポのディレクトリ内
+gh secret set SIGNATE_EMAIL --body your@email.com
+```
+
+## v0.1.7: トークン自動更新に対応
+
+SIGNATEのAPIトークンには有効期限があります。v0.1.7からは `init-repo` が `scripts/refresh_signate_token.py` を自動生成し、GitHub Actions実行のたびにトークンを自動取得します。
+
+### 設定方法（リポのディレクトリ内で実行）
+
+```bash
+gh secret set SIGNATE_EMAIL --body your@email.com
+gh secret set SIGNATE_PASSWORD   # プロンプトで安全に入力
+```
+
+これだけで毎回のActions実行で自動的に新しいトークンが取得されます。`setup-token` を手動で再実行する必要はありません。
+
+### v0.1.6以前からの移行
+
+既存リポジトリは `init-repo --force` で最新ワークフローに更新できます。
+
+```bash
+python -m signate_deploy init-repo --force
+git add .github/workflows/ scripts/
+git commit -m "Update to token auto-refresh workflow"
+git push
+```
+
+`SIGNATE_EMAIL` と `SIGNATE_PASSWORD` をGitHub Secretsに追加すれば完了です（`SIGNATE_TOKEN_B64` は不要になります）。
+
 ## まとめ
 
 ```bash
