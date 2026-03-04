@@ -28,8 +28,9 @@ published: true
 | v0.2.0 | pitch_tempo, arm_strength |
 | v0.3.0 | 残り13リーダーボードを一括追加 |
 | v0.3.1 | Known Issues ドキュメント追加 |
+| v0.3.2 | パークファクター（FanGraphs）追加 |
 
-現在 **16リーダーボード・33関数** に対応しています。
+現在 **17リーダーボード・35関数** に対応しています。
 
 ## 対応リーダーボード一覧
 
@@ -51,6 +52,7 @@ published: true
 | Baserunning | `baserunning()` | Baserunning |
 | Basestealing | `basestealing()` | Baserunning |
 | Swing & Take | `swing_take()` | Batting ※ |
+| Park Factors | `park_factors()` | Analysis |
 
 ※ Swing & Take は Baseball Savant の CSV エンドポイントが現在空データを返す状態のため、取得できません（Known Issue）。
 
@@ -126,6 +128,28 @@ from savant_extras import timer_infractions
 df = timer_infractions(2025)
 print(df[["entity_name", "all_violations", "pitcher_timer", "batter_timer"]])
 ```
+
+### Park Factors（FanGraphs）
+
+MLB 全30球団のパークファクター（球場補正値）を FanGraphs から取得します。予測モデルの特徴量や球場分析に使えます。
+
+```python
+from savant_extras import park_factors, park_factors_range
+
+# 1シーズン分
+df = park_factors(2024)
+print(df[df["team"] == "COL"][["team", "pf_5yr", "pf_hr"]])
+#    team  pf_5yr  pf_hr
+# 5   COL     116    131
+
+# 複数シーズンをまとめて取得（モデル学習用など）
+df = park_factors_range(2020, 2025)
+print(df.shape)  # 180行（6シーズン × 30チーム）
+```
+
+返却列: `season`, `team`, `pf_5yr`, `pf_3yr`, `pf_1yr`, `pf_hr`, `pf_1b`, `pf_2b`, `pf_3b`, `pf_so`, `pf_bb`, `pf_fip`
+- 100 = ニュートラル、100超 = 打者有利、100未満 = 投手有利
+- FanGraphs 2015年以降のデータに対応
 
 ## Kaggle Notebook / Dataset
 
