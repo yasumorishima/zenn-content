@@ -423,3 +423,9 @@ Marcel法の年齢調整は **+0.3%/年（27歳ピーク基準）** と非常に
 → **GitHub**: https://github.com/yasumorishima/npb-prediction
 
 **データ出典**: [プロ野球データFreak](https://baseball-data.com) / [NPB公式サイト](https://npb.jp)
+
+---
+
+## 関連記事
+
+- [Marcel法の限界を超えたい — NPB予測にベイズ回帰を導入した15ステップの記録](https://zenn.dev/shogaku/articles/npb-bayes-projection-story)

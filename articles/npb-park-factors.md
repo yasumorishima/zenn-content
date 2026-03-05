@@ -250,3 +250,9 @@ def calc_multiyear_pf(games, team, year, window=5):
 **データ・コード**: https://github.com/yasumorishima/npb-prediction
 
 データ出典: [baseball-data.com](https://baseball-data.com/) / [npb.jp](https://npb.jp/)（生データの再配布は行っていません）
+
+---
+
+## 関連記事
+
+- [Marcel法の限界を超えたい — NPB予測にベイズ回帰を導入した15ステップの記録](https://zenn.dev/shogaku/articles/npb-bayes-projection-story)

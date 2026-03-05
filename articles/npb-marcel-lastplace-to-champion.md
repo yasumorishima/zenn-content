@@ -222,3 +222,10 @@ Marcel予測は現状の延長線上を示しますが、計算に含まれな�
 - **GitHub**: [yasumorishima/npb-prediction](https://github.com/yasumorishima/npb-prediction)
 - **データ出典**: [baseball-data.com](https://baseball-data.com/) / [npb.jp](https://npb.jp/)
 - Marcel法の計算ロジックはアプリの「計算方法」expanderを参照
+
+---
+
+## 関連記事
+
+- [ベイズ予測（Stan/Ridge）で同じ問いを検証 → 2021年ヤクルト・オリックスの優勝は見えたか](https://zenn.dev/shogaku/articles/npb-bayes-lastplace-to-champion)
+- [Marcel法の限界を超えたい — NPB予測にベイズ回帰を導入した15ステップの記録](https://zenn.dev/shogaku/articles/npb-bayes-projection-story)
