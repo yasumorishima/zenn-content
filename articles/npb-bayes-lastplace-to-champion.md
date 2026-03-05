@@ -195,7 +195,8 @@ NPBデータがない新外国人選手はリーグ平均で代替されます�
 
 - 前記事：https://zenn.dev/shogaku/articles/npb-marcel-lastplace-to-champion
 - ベイズモデルの開発記録：https://zenn.dev/shogaku/articles/npb-bayes-projection-story
-- 予測アプリ：https://npb-prediction.streamlit.app/
+- 予測アプリ（Marcel法・Stan両方の予測を掲載）：https://npb-prediction.streamlit.app/
+- GitHub（Marcel法）：https://github.com/yasumorishima/npb-prediction
 - GitHub（ベイズモデル）：https://github.com/yasumorishima/npb-bayes-projection
 
 ---
