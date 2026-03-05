@@ -108,7 +108,7 @@ def calc_multiyear_pf(games, team, year, window=5):
 
 ![NPB パークファクター年度推移](https://raw.githubusercontent.com/yasumorishima/npb-prediction/main/images/npb_park_factors_trend.png)
 
-*棒グラフ: 単年PF（青=打者有利・赤=投手有利） / 折れ線: 5年平均PF / オレンジ縦線: 改修実施 / 紫点線: 改修予定*
+*棒グラフ: その年のPF（青=打者有利・赤=投手有利） / 折れ線: 5年平均PF / オレンジ縦線: 改修実施 / 紫点線: 改修予定*
 
 ---
 
@@ -188,7 +188,7 @@ def calc_multiyear_pf(games, team, year, window=5):
 
 ## 2025年 全球場ランキング（PF_5yr順）
 
-| 順位 | チーム | 球場 | 単年PF | PF_5yr | 特性 |
+| 順位 | チーム | 球場 | 2025年PF | PF_5yr | 特性 |
 |---|---|---|---|---|---|
 | 1 | 日本ハム | エスコンフィールド | 1.271 | 1.147 | 最も打者有利 |
 | 2 | ヤクルト | 神宮球場 | 1.096 | 1.129 | 打者有利 |
