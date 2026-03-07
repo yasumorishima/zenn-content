@@ -3,7 +3,7 @@ title: "Marcel法の重みをNPBデータで最適化した — MLBデフォル�
 emoji: "⚾"
 type: "tech"
 topics: ["python", "baseball", "データ分析", "統計", "githubactions"]
-published: false
+published: true
 ---
 
 ## はじめに
