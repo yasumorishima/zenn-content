@@ -153,7 +153,7 @@ AVGは2年前の重みが最大（安定性重視）、SLGは2年前の重みが
 - **w0=8**: 3年間の加重平均で直近年を強く重視 → トレンドを反映
 - **REG_PA=2000**: その加重平均をリーグ平均に強く引き戻す → 極端な成績の信頼度を低く見積もる
 
-NPBはMLBより選手の入れ替わりが激しく、年度間の成績変動も大きいため、「直近重視＋強い平均回帰」が最適になると考えられます。
+NPBデータでは「直近重視＋強い平均回帰」の組み合わせが最適となりました。
 
 ### 投手: 1年前の成績が最も予測力が高い
 
@@ -166,7 +166,7 @@ NPBはMLBより選手の入れ替わりが激しく、年度間の成績変動�
 
 NPB投手の最も特徴的な点は、**1年前の重み（w1）が直近年（w0）より大きい**ことです。従来の「直近年が最も重要」という常識とは異なります。
 
-NPB投手はERAの年度間変動がMLBより大きく、直近年だけでなく1年前の実績も加味することで、一時的な好不調をならす効果があると考えられます。
+直近年だけでなく1年前の実績も加味することで、一時的な好不調をならす効果があると考えられます。
 
 ### 2020年の影響
 
@@ -188,15 +188,7 @@ NPB投手はERAの年度間変動がMLBより大きく、直近年だけでな�
 
 ## 再現方法
 
-GitHub Actions で手動実行できます:
-
-```bash
-gh workflow run "Optimize Marcel Weights" \
-  --repo yasumorishima/npb-marcel-weight-study \
-  -f memo="weight optimization"
-```
-
-全結果CSVは [`results/`](https://github.com/yasumorishima/npb-marcel-weight-study/tree/master/results) に保存されます。
+コードと全結果CSVは [npb-marcel-weight-study](https://github.com/yasumorishima/npb-marcel-weight-study) で公開しています。
 
 ## まとめ
 
