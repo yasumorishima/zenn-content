@@ -22,7 +22,7 @@ GitHubで複数リポジトリを運用していると、プロフィールREADM
 <!-- OSS_STATS_START -->(40 PRs / 17 Merged)<!-- OSS_STATS_END --> across 12 repositories
 ```
 
-一方、[oss-contributions](https://github.com/yasumorishima/oss-contributions) リポには全PRの詳細が管理されており、毎週月曜に自動リフレッシュされています。
+一方、[oss-contributions](https://github.com/your-username/oss-contributions) リポには全PRの詳細が管理されており、毎週月曜に自動リフレッシュされています。
 
 問題は、プロフィール側の更新スクリプトが**個別にリポごとのPR数をAPIで取得**していたこと。リポのリストが不完全だと、数字がずれます。
 
@@ -62,7 +62,7 @@ def fetch_oss_readme() -> str | None:
     """oss-contributions README.md を GitHub API で取得"""
     output = run([
         "gh", "api",
-        "repos/yasumorishima/oss-contributions/contents/README.md",
+        "repos/your-username/oss-contributions/contents/README.md",
         "--jq", ".content",
     ])
     if not output:
@@ -100,7 +100,7 @@ def parse_oss_summary(text: str) -> list[dict]:
 # oss-contributions/.github/workflows/refresh-contributions.yml
 - name: Sync stats to profile README
   env:
-    GH_TOKEN: ${{ secrets.CLAUDE_CONFIG_PAT }}
+    GH_TOKEN: ${{ secrets.MY_PAT }}
   run: |
     git clone https://x-access-token:${GH_TOKEN}@github.com/user/user.git /tmp/profile
     # ... 更新 ...
@@ -134,7 +134,7 @@ oss-contributions → (PAT) → プロフィールリポ  ❌ 403
 ### ワークフロー構成
 
 ```yaml
-# yasumorishima/.github/workflows/update-profile.yml
+# your-username/.github/workflows/update-profile.yml
 on:
   schedule:
     - cron: '30 9 * * 1'  # 月曜09:30 UTC（oss-contributions更新の30分後）
