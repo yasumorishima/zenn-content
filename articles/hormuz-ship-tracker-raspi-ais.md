@@ -173,7 +173,7 @@ setInterval(loadVessels, 30000);
 - HSC: シアン
 - Unknown: グレー
 
-![地図のスクリーンショット](https://raw.githubusercontent.com/yasumorishima/hormuz-ship-tracker/master/docs/screenshot.png)
+![ライブ地図のスクリーンショット（破線はデータ収集範囲）](https://raw.githubusercontent.com/yasumorishima/hormuz-ship-tracker/master/docs/screenshot.png)
 
 ### 4. matplotlibスナップショット（snapshot.py）
 
