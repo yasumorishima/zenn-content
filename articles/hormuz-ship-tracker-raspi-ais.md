@@ -46,7 +46,7 @@ Raspberry Pi 5
   (data/ais.db)  (port 8002)    (スナップショット)
 ```
 
-このRaspberry Pi 5は、既にNPB成績予測API（port 8000）、MLB勝利確率API（port 8001）、Streamlit keepalive（Playwright）の3つのDockerコンテナが稼働しています。今回のship trackerは4つ目と5つ目のコンテナとして追加しました。
+Raspberry Pi 5上でDockerコンテナとして常時稼働させています。
 
 ## 実装の詳細
 
@@ -298,6 +298,6 @@ docker logs -f hormuz-tracker
 
 ## まとめ
 
-aisstream.ioのWebSocket APIを使えば、特定海域の船舶をリアルタイムに収集・可視化するシステムを比較的少ないコードで構築できます。Raspberry Pi 5は既に他のAPIコンテナが稼働していますが、AISデータの収集程度であればリソース的に問題ありませんでした。
+aisstream.ioのWebSocket APIを使えば、特定海域の船舶をリアルタイムに収集・可視化するシステムを比較的少ないコードで構築できます。Raspberry Pi 5でもAISデータの収集程度であればリソース的に問題ありませんでした。
 
 データソース: [aisstream.io](https://aisstream.io/)
