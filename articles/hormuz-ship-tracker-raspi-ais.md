@@ -37,13 +37,14 @@ Raspberry Pi 5
   +-------------------+     +-------------------+
   | ais-collector      |     | snapshot-cron      |
   | - WebSocket受信    |     | - matplotlib画像   |
+  | - 陸地フィルタ     |     | - 陸地フィルタ     |
   | - SQLite書き込み   |     | - SHA256比較       |
   | - FastAPI配信      |     | - git push (6h毎) |
   +-------------------+     +-------------------+
-    |       |                       |
-    v       v                       v
-  SQLite  Leaflet.js地図        GitHub README
-  (data/ais.db)  (port 8002)    (スナップショット)
+    |       |       |               |
+    v       v       v               v
+  SQLite  Leaflet  Natural Earth  GitHub README
+  (ais.db) (8002)  (land_mask)   (スナップショット)
 ```
 
 Raspberry Pi 5上でDockerコンテナとして常時稼働させています。
@@ -282,6 +283,32 @@ docker logs -f hormuz-tracker
 
 ブラウザで `http://<ラズパイのIP>:8002` にアクセスすると地図が表示されます。
 
+### 6. 陸地フィルタ（land_filter.py）
+
+AISデータには、GPS精度の問題や建物に設置されたAIS中継器からの信号により、陸上に位置するデータが混入することがあります。これを除外するために、[Natural Earth](https://www.naturalearthdata.com/)の10m解像度陸地ポリゴンデータを使った空間フィルタを実装しました。
+
+```python
+from shapely.geometry import Point, shape
+from shapely.ops import unary_union
+from shapely.prepared import prep
+
+# GeoJSONから陸地ポリゴンを読み込み、prepared geometryで高速化
+with open("data/land_mask.geojson") as f:
+    data = json.load(f)
+geoms = [shape(feature["geometry"]) for feature in data["features"]]
+land = unary_union(geoms)
+prepared_land = prep(land)
+
+def is_on_land(lat: float, lon: float) -> bool:
+    return prepared_land.contains(Point(lon, lat))
+```
+
+Shapely の `prepared geometry` を使うことで、ポリゴンの内部インデックスが事前構築され、繰り返しの点包含判定が高速に実行されます。
+
+ランドマスクの生成は `scripts/generate_land_mask.py` で再現可能です。Natural Earth 10mデータをダウンロードし、ペルシャ湾周辺にクロップ・簡略化して34KBのGeoJSONにまとめています。
+
+フィルタはコレクター（DB保存前）・API（クエリ結果返却時）・スナップショット（画像生成時）の3箇所に適用しています。ランドマスクが読み込めない場合はfail-open（フィルタなしで通過）とし、データ収集が止まらない設計にしています。
+
 ## 設計判断のメモ
 
 - **なぜSQLite**: 単一ファイルで管理が簡単。Raspberry Piのリソース制約上、PostgreSQLは不要。aiosqliteで非同期アクセス可能
@@ -289,6 +316,8 @@ docker logs -f hormuz-tracker
 - **なぜSHA256比較**: 船舶の位置が変わっていない時間帯（夜間など）に無駄なgit pushを避ける
 - **なぜコレクターとAPIを同一プロセスで実行**: asyncio.gatherで並行実行すれば1プロセスで済む。コンテナを分けるほどの規模ではない
 - **なぜ海岸線を近似ポリゴンで描画**: スナップショットにshapefileライブラリの依存を入れたくなかった。視覚的な位置把握ができれば十分
+- **なぜNatural Earth 10mを選択**: 50m/110mではケシュム島（ペルシャ湾最大の島）やバンダルアッバス付近の海岸線が粗すぎた。10mなら26ポリゴン・34KBに収まり、RPi5でも問題なく動作する
+- **なぜprepared geometryを使用**: Shapelyのprepared geometryは内部にR-treeインデックスを構築し、繰り返しの点包含判定を高速化する。WebSocketで毎秒複数のAISメッセージが到着するため、素のcontainsでは遅い
 
 ## 今後の課題
 
