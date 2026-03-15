@@ -1,332 +1,136 @@
 ---
-title: "Raspberry Pi 5でホルムズ海峡のリアルタイム船舶追跡システムを構築した"
+title: "ホルムズ海峡の船舶データを可視化したら、封鎖の影響が数字に表れていた"
 emoji: "🚢"
 type: "tech"
 topics: ["python", "raspberrypi", "docker", "fastapi", "ais"]
 published: false
 ---
 
-## はじめに
+## この記事について
 
-ホルムズ海峡は世界の石油輸送の約20%が通過する、地政学的に最も重要な海上チョークポイントの一つです。この海峡を通過する船舶をリアルタイムで追跡するシステムを、手持ちのRaspberry Pi 5上にDocker環境で構築しました。
+2026年3月、ホルムズ海峡が事実上の通航停止状態に陥りました。世界の石油輸送の約20%が通過するこのチョークポイントで何が起きているのか——Raspberry Pi 5と無料のAISデータを使って、リアルタイムモニタリングシステムを構築し、実際のデータを観測しています。
 
-本記事は、構築過程の自分用振り返りノートとして書いています。
+本記事では、構築した仕組みと、そこから見えてきたデータの特徴を紹介します。
 
-## AIS（自動船舶識別装置）とは
+**リポジトリ**: [yasumorishima/hormuz-ship-tracker](https://github.com/yasumorishima/hormuz-ship-tracker)
 
-AIS（Automatic Identification System）は、船舶が自動的に位置・速度・針路・船名・船種などの情報をVHF帯で送信する国際的な安全システムです。300総トン以上の国際航海船舶には搭載が義務付けられています。
+## AISデータとは
 
-AISデータには主に2種類のメッセージがあります。
+AIS（Automatic Identification System）は、船舶が位置・速度・針路・船名・船種などをVHF帯で自動送信する国際安全システムです。300総トン以上の国際航海船舶に搭載が義務付けられています。
 
-- **PositionReport**: 位置・速度・針路・船首方位（数秒〜数分間隔で送信）
-- **ShipStaticData**: 船名・船種・サイズ・目的地・喫水（数分間隔で送信）
+[aisstream.io](https://aisstream.io/)が世界中の陸上AIS受信局から収集したデータをWebSocket APIで無料配信しており、今回のデータソースとして利用しています。
 
-## データソース: aisstream.io
-
-[aisstream.io](https://aisstream.io/) は、世界中のAIS受信局からリアルタイムデータをWebSocketで配信する無料サービスです。GitHubアカウントで登録すればAPIキーが発行されます。
-
-WebSocket接続時にバウンディングボックスとメッセージタイプを指定すると、その範囲内の船舶データだけがストリーミングされます。
-
-## アーキテクチャ
+## システム構成
 
 ```
 aisstream.io (WebSocket)
-    |
-    v
-Raspberry Pi 5
-  +-------------------+     +-------------------+
-  | ais-collector      |     | snapshot-cron      |
-  | - WebSocket受信    |     | - matplotlib画像   |
-  | - 陸地フィルタ     |     | - 陸地フィルタ     |
-  | - SQLite書き込み   |     | - SHA256比較       |
-  | - FastAPI配信      |     | - git push (6h毎) |
-  +-------------------+     +-------------------+
-    |       |       |               |
-    v       v       v               v
-  SQLite  Leaflet  Natural Earth  GitHub README
-  (ais.db) (8002)  (land_mask)   (スナップショット)
+  → Collector (AIS受信 + 陸地フィルタ + SQLite保存)
+  → Analytics Engine (ゲートライン通過検知 + 船舶状態分類)
+  → FastAPI + Leaflet.js + Chart.js (ダッシュボード)
+  → matplotlib (6時間ごとスナップショット → GitHub自動push)
 ```
 
-Raspberry Pi 5上でDockerコンテナとして常時稼働させています。
+Raspberry Pi 5上のDockerで2コンテナ（collector + snapshot-cron）を24時間稼働させています。
 
-## 実装の詳細
+## データから見えること
 
-### 1. WebSocketコレクター（collector.py）
+### 停泊率 67% — 平時との差
 
-aisstream.ioへのWebSocket接続、AISメッセージのパース、SQLiteへの保存を行います。
+観測している約290隻のうち、約67%が停泊状態（速度0.5ノット未満）でした。通常の港湾エリアでは30〜40%程度と考えられるため、顕著に高い値です。
+
+### 待機船団 — 35隻が6時間以上停泊
+
+6時間以上移動していない船舶を「待機船団」として集計すると、約35隻が該当しました。24時間以上動いていない船舶も11隻確認されています。
+
+待機船団の国旗（MMSI MIDから推定）：
+
+| 国旗 | 隻数 |
+|---|---|
+| パナマ | 9 |
+| マーシャル諸島 | 3 |
+| UAE | 3 |
+| クウェート | 2 |
+| その他（リベリア、マレーシア、韓国等） | 各1 |
+
+パナマやマーシャル諸島は便宜置籍国（open registry）であり、大型商船やタンカーが多く登録されています。待機船団の中にタンカーが7隻含まれていた点も特徴的です。
+
+### 海峡通過 — ほぼゼロ
+
+ホルムズ海峡の最狭部にゲートライン（仮想通過線）を設定し、船舶の通過を自動検知する仕組みを実装しました。24時間で検出されたのは1隻のみでした。
+
+ただし、aisstream.ioの無料プランは**陸上AIS受信局**に基づくデータであり、海峡中央部はカバレッジが限られています。衛星AISであれば異なる結果が得られる可能性があります。つまり「データがないこと」が「船がいないこと」を直接意味するわけではなく、AISカバレッジの限界を考慮する必要があります。
+
+### UAE沿岸に集中する船舶
+
+データの大部分がDubai / Jebel Ali / Fujairah周辺に集中しています。この地域に3つのゲートラインを設置して分析しました。
+
+| ゲート | INBOUND | OUTBOUND |
+|---|---|---|
+| Dubai / Jebel Ali Approach | 20 | 9 |
+| Fujairah Approach | 0 | 7 |
+| Strait of Hormuz | 0 | 1 |
+
+Dubai港への入港が出港を大きく上回っている点、Fujairahは出港のみ（バンカリング＝燃料補給後の出航と推測される）という非対称パターンが観測されています。
+
+## 技術的な実装
+
+### ゲートライン通過検知
+
+海峡やポートの入口に仮想ゲートライン（2点を結ぶ線分）を定義し、船舶の連続する位置レポートがこの線分を横切ったかどうかを計算幾何で判定しています。
 
 ```python
-# ホルムズ海峡のバウンディングボックス
-BBOX = [[23.5, 54.0], [27.5, 58.5]]
-
-subscribe_msg = {
-    "APIKey": API_KEY,
-    "BoundingBoxes": [BBOX],
-    "FilterMessageTypes": ["PositionReport", "ShipStaticData"],
-}
+def segments_intersect(p1, p2, p3, p4):
+    """線分p1-p2と線分p3-p4が交差するか判定"""
+    d1 = cross_product(p3, p4, p1)
+    d2 = cross_product(p3, p4, p2)
+    d3 = cross_product(p1, p2, p3)
+    d4 = cross_product(p1, p2, p4)
+    if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and \
+       ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
+        return True
+    return False
 ```
 
-ShipStaticDataメッセージは船名・船種・目的地などの静的情報を含みます。これをインメモリキャッシュに保持し、PositionReportと紐づけてSQLiteに保存します。
+通過方向（INBOUND/OUTBOUND）はゲートベクトルに対する外積の符号で判定し、同一船舶の6時間以内の重複検知を除外しています。
+
+### MMSI → 国旗マッピング
+
+AISのMetaDataにcountry_codeフィールドが存在しないケースがあったため、MMSI番号の上位3桁（MID: Maritime Identification Digits）から国旗を推定する方式に切り替えました。100カ国以上のMIDに対応しています。
+
+### データ駆動の状況判定
+
+ダッシュボードの表示テキストは全てデータから自動生成されます。海峡通過数・停泊率・待機船団数に基づいて状況レベル（normal / elevated / high / critical）を判定し、UIの色やメッセージが自動的に変化します。
 
 ```python
-# ShipStaticDataをインメモリキャッシュに保持
-static_cache: dict[int, dict] = {}
-
-if msg_type == "ShipStaticData":
-    meta = msg.get("Message", {}).get("ShipStaticData", {})
-    mmsi = msg.get("MetaData", {}).get("MMSI")
-    if mmsi:
-        static_cache[mmsi] = {
-            "ship_name": meta.get("Name", "").strip(),
-            "ship_type": meta.get("Type"),
-            "destination": meta.get("Destination", "").strip(),
-            "draught": meta.get("MaximumStaticDraught"),
-            "length": meta.get("Dimension", {}).get("A", 0)
-                    + meta.get("Dimension", {}).get("B", 0),
-            "width": meta.get("Dimension", {}).get("C", 0)
-                    + meta.get("Dimension", {}).get("D", 0),
-        }
+if strait_transits == 0 and anchored_pct > 40:
+    return {"level": "critical", "title": "Strait Transit Suspended", ...}
+elif 0 < strait_transits <= 5:
+    return {"level": "elevated", "title": "Limited Strait Transit", ...}
+else:
+    return {"level": "normal", "title": "Monitoring Active", ...}
 ```
 
-船のサイズは、AIS仕様上A/B/C/Dの4つの距離値として送信されます。A+Bが全長、C+Dが全幅になります。
+この設計により、危機が解消されれば表示も自動的に通常モードに戻ります。
 
-接続切断時は自動再接続します。
+### 陸地フィルタ
 
-```python
-except (websockets.exceptions.ConnectionClosed, OSError) as e:
-    logger.warning("Connection lost: %s -- reconnecting in 10s", e)
-    await asyncio.sleep(10)
-```
+AISデータにはGPS精度の問題や建物設置のAIS中継器による陸上位置データが混入します。Natural Earth 10mの陸地ポリゴンとShapelyのprepared geometryを使い、陸上の位置を除外しています。
 
-### 2. FastAPI（api.py）
+### AIS destination正規化
 
-3つのAPIエンドポイントを提供します。
+AISの目的地フィールドは自由入力のため、同じ港が多数の表記で送信されます（DUBAI / AE DXB / AEDXB / DMC DUBAI 等）。40以上のバリアントを20の正規名にマッピングしています。
 
-```python
-app = FastAPI(title="Hormuz Ship Tracker")
+## 制約と注意点
 
-# 直近30分の各船舶の最新位置
-@app.get("/api/latest")
-async def latest_positions():
-    async with aiosqlite.connect(DB_PATH) as db:
-        rows = await db.execute_fetchall("""
-            SELECT mmsi, latitude, longitude, speed, course, heading,
-                   ship_name, ship_type, destination, flag, timestamp,
-                   length, width
-            FROM positions
-            WHERE id IN (
-                SELECT MAX(id) FROM positions
-                WHERE received_at > datetime('now', '-30 minutes')
-                GROUP BY mmsi
-            )
-        """)
-    # ...
-
-# 特定船舶の航跡（デフォルト6時間）
-@app.get("/api/tracks/{mmsi}")
-async def vessel_track(mmsi: int, hours: int = 6):
-    # ...
-
-# 統計情報（船種別隻数など）
-@app.get("/api/stats")
-async def stats():
-    # ...
-```
-
-AIS船種コードは数値で送信されるため、人間が読めるラベルに変換しています。
-
-```python
-SHIP_TYPE_LABELS = {
-    range(70, 80): "Cargo",
-    range(80, 90): "Tanker",
-    range(60, 70): "Passenger",
-    range(30, 36): "Fishing/Towing/Dredging",
-    range(36, 40): "Military/Sailing/Pleasure",
-    range(40, 50): "HSC",  # High Speed Craft
-}
-```
-
-### 3. Leaflet.jsリアルタイム地図（map.html）
-
-CARTO darkタイルを使ったダークテーマの地図です。船種ごとに色分けしたドットで船舶を表示し、30秒ごとに自動更新します。
-
-```javascript
-// ダークテーマのタイル
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '...',
-    maxZoom: 19,
-}).addTo(map);
-
-// 30秒ごとに自動更新
-loadVessels();
-setInterval(loadVessels, 30000);
-```
-
-船舶をクリックするとポップアップで詳細情報（船名、速度、針路、国旗、目的地、サイズ）が表示されます。「Show Track (6h)」ボタンで過去6時間の航跡をポリラインで描画します。
-
-船種ごとの色分け:
-- Tanker: オレンジ
-- Cargo: 青
-- Passenger: 緑
-- Fishing: 紫
-- Military: 赤
-- HSC: シアン
-- Unknown: グレー
-
-![ライブ地図のスクリーンショット（破線はデータ収集範囲）](https://raw.githubusercontent.com/yasumorishima/hormuz-ship-tracker/master/docs/screenshot.png)
-
-### 4. matplotlibスナップショット（snapshot.py）
-
-6時間ごとにSQLiteから最新データを読み出し、ダークテーマの静的マップ画像を生成します。海岸線の近似ポリゴンも描画して地理的コンテキストを与えています。
-
-```python
-fig, ax = plt.subplots(figsize=(14, 9), facecolor="#0a0a1a")
-ax.set_facecolor("#0d1b2a")
-
-# 海岸線の近似描画
-for segment in COASTLINE_SEGMENTS:
-    lats, lons = zip(*segment)
-    ax.plot(lons, lats, color="#2a3a4a", linewidth=1.2, zorder=2)
-    ax.fill(lons, lats, color="#111822", alpha=0.6, zorder=1)
-
-# 船種ごとに色分けしてプロット
-for ship_type, group in sorted(by_type.items()):
-    color = get_color(ship_type)
-    lats = [v["lat"] for v in group]
-    lons = [v["lon"] for v in group]
-    size = 30 if "Tanker" in ship_type else 22
-    ax.scatter(
-        lons, lats,
-        s=size, c=color, edgecolors="white", linewidths=0.4,
-        alpha=0.85, zorder=5, label=f"{ship_type} ({len(group)})",
-    )
-```
-
-### 5. 自動push（auto_push.sh）
-
-スナップショット画像のSHA256ハッシュを前回と比較し、変化がある場合のみgit commit & pushします。
-
-```bash
-# SHA256比較で変化検出
-NEW_HASH=$(sha256sum "$SNAPSHOT" | cut -d' ' -f1)
-OLD_HASH=$(sha256sum "$DEST_IMG" | cut -d' ' -f1)
-
-if [ "$NEW_HASH" = "$OLD_HASH" ]; then
-    echo "No change in snapshot -- skipping push"
-    exit 0
-fi
-
-# コミットメッセージに隻数とタイムスタンプを含める
-VESSEL_COUNT=$(grep -oP 'Active vessels.*?: \K[0-9]+' "$STATS" || echo "?")
-git commit -m "snapshot: ${VESSEL_COUNT} vessels at ${TIMESTAMP}"
-git push origin HEAD
-```
-
-## Docker構成
-
-2つのコンテナで構成しています。
-
-```yaml
-services:
-  ais-collector:
-    build: .
-    container_name: hormuz-tracker
-    restart: unless-stopped
-    ports:
-      - "8002:8002"
-    env_file:
-      - .env
-    volumes:
-      - ./data:/app/data
-      - .:/repo
-
-  snapshot-cron:
-    build: .
-    container_name: hormuz-snapshot
-    restart: unless-stopped
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        apt-get update -qq && apt-get install -y -qq git cron >/dev/null 2>&1
-        echo "0 0,6,12,18 * * * /bin/bash /app/src/auto_push.sh >> /var/log/snapshot.log 2>&1" | crontab -
-        /bin/bash /app/src/auto_push.sh >> /var/log/snapshot.log 2>&1 || true
-        cron -f
-    env_file:
-      - .env
-    environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - GITHUB_REPO=${GITHUB_REPO:-yasumorishima/hormuz-ship-tracker}
-    volumes:
-      - ./data:/app/data
-      - .:/repo
-    depends_on:
-      - ais-collector
-```
-
-`ais-collector`がWebSocket受信 + FastAPIを担当し、`snapshot-cron`がcronでスナップショット生成 + git pushを担当します。SQLiteファイル（`data/ais.db`）はボリュームマウントで共有しています。
-
-## 起動方法
-
-```bash
-# .envファイルにAPIキーとGitHubトークンを設定
-echo "AISSTREAM_API_KEY=your-api-key" > .env
-echo "GITHUB_TOKEN=your-github-token" >> .env
-echo "GITHUB_REPO=your-username/hormuz-ship-tracker" >> .env
-
-# 起動
-docker compose up -d
-
-# ログ確認
-docker logs -f hormuz-tracker
-```
-
-ブラウザで `http://<ラズパイのIP>:8002` にアクセスすると地図が表示されます。
-
-### 6. 陸地フィルタ（land_filter.py）
-
-AISデータには、GPS精度の問題や建物に設置されたAIS中継器からの信号により、陸上に位置するデータが混入することがあります。これを除外するために、[Natural Earth](https://www.naturalearthdata.com/)の10m解像度陸地ポリゴンデータを使った空間フィルタを実装しました。
-
-```python
-from shapely.geometry import Point, shape
-from shapely.ops import unary_union
-from shapely.prepared import prep
-
-# GeoJSONから陸地ポリゴンを読み込み、prepared geometryで高速化
-with open("data/land_mask.geojson") as f:
-    data = json.load(f)
-geoms = [shape(feature["geometry"]) for feature in data["features"]]
-land = unary_union(geoms)
-prepared_land = prep(land)
-
-def is_on_land(lat: float, lon: float) -> bool:
-    return prepared_land.contains(Point(lon, lat))
-```
-
-Shapely の `prepared geometry` を使うことで、ポリゴンの内部インデックスが事前構築され、繰り返しの点包含判定が高速に実行されます。
-
-ランドマスクの生成は `scripts/generate_land_mask.py` で再現可能です。Natural Earth 10mデータをダウンロードし、ペルシャ湾周辺にクロップ・簡略化して34KBのGeoJSONにまとめています。
-
-フィルタはコレクター（DB保存前）・API（クエリ結果返却時）・スナップショット（画像生成時）の3箇所に適用しています。ランドマスクが読み込めない場合はfail-open（フィルタなしで通過）とし、データ収集が止まらない設計にしています。
-
-## 設計判断のメモ
-
-- **なぜSQLite**: 単一ファイルで管理が簡単。Raspberry Piのリソース制約上、PostgreSQLは不要。aiosqliteで非同期アクセス可能
-- **なぜインメモリキャッシュ**: ShipStaticDataとPositionReportは別メッセージで到着する。SQLiteをJOINで引くよりdict参照のほうが高速
-- **なぜSHA256比較**: 船舶の位置が変わっていない時間帯（夜間など）に無駄なgit pushを避ける
-- **なぜコレクターとAPIを同一プロセスで実行**: asyncio.gatherで並行実行すれば1プロセスで済む。コンテナを分けるほどの規模ではない
-- **なぜ海岸線を近似ポリゴンで描画**: スナップショットにshapefileライブラリの依存を入れたくなかった。視覚的な位置把握ができれば十分
-- **なぜNatural Earth 10mを選択**: 50m/110mではケシュム島（ペルシャ湾最大の島）やバンダルアッバス付近の海岸線が粗すぎた。10mなら26ポリゴン・34KBに収まり、RPi5でも問題なく動作する
-- **なぜprepared geometryを使用**: Shapelyのprepared geometryは内部にR-treeインデックスを構築し、繰り返しの点包含判定を高速化する。WebSocketで毎秒複数のAISメッセージが到着するため、素のcontainsでは遅い
-
-## 今後の課題
-
-- SQLiteの定期パージ（古いレコードの削除）
-- 航路密度のヒートマップ可視化
-- 特定船舶のアラート通知
+- **陸上AISの限界**: 無料のaisstream.ioは陸上受信局ベース。海峡中央部や沖合のカバレッジは限られる
+- **AIS速度102.3ノット**: AIS仕様で「速度利用不可」を示すセンチネル値（0x3FF）。異常値ではなくフィルタが必要
+- **2分間隔のスロットリング**: 同一船舶のデータを2分間隔に間引いているため、高速通過の検出精度に影響する可能性がある
+- **データ収集期間**: 現時点で数日分のデータ。長期的なトレンド分析には蓄積が必要
 
 ## まとめ
 
-aisstream.ioのWebSocket APIを使えば、特定海域の船舶をリアルタイムに収集・可視化するシステムを比較的少ないコードで構築できます。Raspberry Pi 5でもAISデータの収集程度であればリソース的に問題ありませんでした。
+aisstream.ioの無料APIとRaspberry Pi 5を使って、ペルシャ湾全域の船舶をリアルタイムに収集・分析するシステムを構築しました。停泊率の高さ、待機船団の存在、海峡通過数の少なさなど、現在の海上交通の状況がデータとして観測されています。
 
-データソース: [aisstream.io](https://aisstream.io/)
+データは蓄積を続けており、今後は時系列での変化を追跡できる見込みです。
+
+データソース: [aisstream.io](https://aisstream.io/) / 陸地ポリゴン: [Natural Earth](https://www.naturalearthdata.com/)
