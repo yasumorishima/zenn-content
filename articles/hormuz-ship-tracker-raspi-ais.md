@@ -18,6 +18,9 @@ published: false
 
 **リポジトリ**: [yasumorishima/hormuz-ship-tracker](https://github.com/yasumorishima/hormuz-ship-tracker)
 
+![ペルシャ湾全域の船舶分布（3月中旬時点） — UAE沿岸に集中し、海峡中央部はほぼ空白](https://raw.githubusercontent.com/yasumorishima/hormuz-ship-tracker/master/docs/snapshot_latest.png)
+*ペルシャ湾全域のスナップショット（6時間ごと自動生成）。ゲートラインの位置、transit IN/OUT統計、船種別の分布が表示されている。UAE沿岸に船舶が集中し、海峡中央部がほぼ空白であることが確認できる。*
+
 ## AISデータとは
 
 AIS（Automatic Identification System）は、船舶が位置・速度・針路・船名・船種などをVHF帯で自動送信する国際安全システムです。300総トン以上の国際航海船舶に搭載が義務付けられています。
