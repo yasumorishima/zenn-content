@@ -1,5 +1,5 @@
 ---
-title: "NPB予測にベイズ統合+モンテカルロを実装した作業メモ"
+title: "NPB予測アプリにベイズ統合+モンテカルロを組み込んだ作業メモ"
 emoji: "🎯"
 type: "tech"
 topics: ["baseball", "npb", "python", "ベイズ統計", "streamlit"]
@@ -8,18 +8,18 @@ published: false
 
 ## はじめに
 
-前回の記事で、NPB選手成績予測にベイズ回帰（Stan/Ridge）を導入する研究過程を紹介しました。
+前回の記事で、NPB選手成績予測にベイズ回帰（Stan/Ridge）を導入する試行錯誤を紹介しました。
 
 https://zenn.dev/shogaku/articles/npb-bayes-projection-story
 
-その研究リポ（npb-bayes-projection）で得られた知見を、**本番の予測システム**（npb-prediction）に統合しました。研究から本番へ、7フェーズに分けた統合作業の記録です。
+そのときは別リポ（npb-bayes-projection）で実験していたのですが、今回はメインのアプリ（npb-prediction）に組み込みました。7フェーズに分けた作業メモです。
 
 → **GitHub**: https://github.com/yasumorishima/npb-prediction
 → **Streamlit**: https://npb-prediction.streamlit.app/
 
 ### この記事の対象読者
 
-- 機械学習の研究コード → 本番システムへの統合プロセスに興味がある方
+- 実験コードをアプリに組み込むプロセスに興味がある方
 - ベイズ予測の不確実性をUIに反映する方法を知りたい方
 - モンテカルロ・シミュレーションをStreamlitで可視化したい方
 
@@ -254,7 +254,7 @@ Saber:  "中野 拓夢"   （半角スペース）
 
 ## まとめ
 
-研究リポで検証した手法を本番に統合する作業は、研究そのものとは別の難しさがありました。
+実験リポで試した手法をアプリに組み込む作業は、実験そのものとは別の面倒さがありました。
 
 - **データ品質**: 外国人選手の英語名・前リーグ成績を全件Web検索で裏取り。推測で書いたデータは高確率で間違う
 - **アーキテクチャ**: Stanをランタイムで動かさない設計（posteriors.json）で、軽量環境でもベイズ推論を実現
