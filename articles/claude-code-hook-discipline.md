@@ -3,7 +3,7 @@ title: "Claude Code hook で AI coding assistant の規律を補強する — �
 emoji: "🪝"
 type: "tech"
 topics: ["claude", "claudecode", "ai", "workflow", "shell"]
-published: true
+published: false
 ---
 
 ## はじめに
