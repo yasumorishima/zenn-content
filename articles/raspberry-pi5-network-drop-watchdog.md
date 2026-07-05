@@ -3,7 +3,7 @@ title: "Raspberry Pi 5 が電源ONなのにネットから消える問題を jou
 emoji: "📡"
 type: "tech"
 topics: ["raspberrypi", "linux", "networkmanager", "tailscale", "ネットワーク"]
-published: false
+published: true
 ---
 
 ## 症状
@@ -113,3 +113,119 @@ cat /home/pi/logs/net-watchdog.log   # → ファイルなし（=再起動して
 - ただし OS 自体が止まる系の障害には cron 駆動の watchdog は効かない点は理解しておく。
 
 根本原因の特定はまだですが、少なくとも「毎回手で電源を入れ直す」運用からは抜けられました。
+
+---
+
+## 追記（続編）：gateway ping は通るのに外部だけ死ぬ「選択的な断」と watchdog v2
+
+上の watchdog を入れてから約2週間後、今度は**まったく別のパターン**で死にました。しかも gateway への ping は通るので、上の watchdog は発火しません。
+
+### 症状（前回と全く違う）
+
+- SSH（Tailscale 経由）は普通に生きている
+- gateway への ping も通る
+- なのに名前解決が全滅（`getent hosts github.com` が失敗）
+- 宛先によって挙動がバラバラ：
+  - Google 系だけ HTTPS 200 が返る
+  - GitHub / Cloudflare（1.1.1.1）/ その他 → TCP connect timeout
+  - IPv6 は全滅
+
+「Google だけ通る」ので ISP・ルーター障害に見えますが、結論から言うとこれも **Pi 自身（wlan0 の Wi-Fi クライアント状態の破損）** でした。
+
+### 切り分け1：同じルーター配下の別端末から同じ宛先を叩く（これが決定打）
+
+同じ Wi-Fi につながっている PC からは GitHub 等へ普通に繋がりました。→ **回線・ルーターは無罪、Pi 固有の問題**と確定。ここを省くと「ルーター再起動」という無駄な物理対応に進んでしまうところでした。
+
+### 切り分け2：DNS サーバー単位の生死を UDP で直接確認
+
+Pi に `dig` / `nslookup` が入っていなくても、python3 数行で DNS クエリを直接投げられます。
+
+```python
+import socket, struct
+
+def q(server, timeout=3):
+    # minimal DNS A query for github.com
+    pkt = struct.pack('>HHHHHH', 0x1234, 0x0100, 1, 0, 0, 0)
+    for part in b'github com'.split():
+        pkt += bytes([len(part)]) + part
+    pkt += b'\x00' + struct.pack('>HH', 1, 1)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(timeout)
+    try:
+        s.sendto(pkt, (server, 53))
+        data, _ = s.recvfrom(512)
+        return f'OK answers={struct.unpack(">H", data[6:8])[0]}'
+    except Exception as e:
+        return f'FAIL {type(e).__name__}'
+    finally:
+        s.close()
+
+for srv in ['192.168.1.1', '100.100.100.100', '8.8.8.8', '1.1.1.1']:
+    print(srv, '->', q(srv))
+```
+
+結果は `ルーター=FAIL / Tailscale MagicDNS=FAIL / 8.8.8.8=OK / 1.1.1.1=FAIL`。つまり「DNS が死んでいる」のではなく「**特定宛先への通信そのものが死んでいる**」ことが分かります（DNS 失敗はその一症状にすぎない）。`ip route get` も UFW も正常でした。
+
+### 復旧：wlan0 の完全再接続（`reapply` では直らない）
+
+`nmcli dev reapply wlan0`（設定の再適用）では直りませんでした。**disconnect → connect の完全再接続**が必要です。SSH 自体が wlan0 越しなので、途中で切断されても最後まで走るよう detach して実行します。
+
+```bash
+sudo nohup bash -c 'nmcli dev disconnect wlan0; sleep 3; nmcli dev connect wlan0' >/dev/null 2>&1 &
+```
+
+約20秒で復帰し、全宛先が 200 に戻り、**最初「死んでいる」ように見えたルーター DNS も復活**しました。つまり DNS 死・選択的 timeout・IPv6 全滅は、すべて wlan0 の状態破損という単一原因の症状でした。
+
+### watchdog v2：外部疎通も監視する
+
+gateway ping だけでは今回のパターンを見逃すので、tier2 を追加した v2 に更新しました。
+
+```bash
+#!/bin/bash
+# net-watchdog v2: two-tier self-healing
+# tier1: gateway unreachable -> restart NetworkManager
+# tier2: gateway OK but external connectivity mostly dead (<2 of 4 probes) -> full wlan0 reconnect
+LOG=/home/pi/logs/net-watchdog.log
+STATE=/home/pi/logs/net-watchdog.last-reconnect
+GW=192.168.1.1   # 自宅ルータのIPに置き換え
+mkdir -p /home/pi/logs
+
+if ! ping -c3 -W3 $GW >/dev/null 2>&1; then
+  echo "$(date -Is) gateway unreachable -> restart NetworkManager" >> $LOG
+  systemctl restart NetworkManager
+  exit 0
+fi
+
+alive=0
+for url in https://www.google.com https://github.com https://1.1.1.1 https://www.yahoo.co.jp; do
+  curl -4 -sS --max-time 5 -o /dev/null "$url" 2>/dev/null && alive=$((alive+1))
+done
+
+if [ "$alive" -lt 2 ]; then
+  now=$(date +%s)
+  last=$(cat "$STATE" 2>/dev/null || echo 0)
+  if [ $((now - last)) -lt 1800 ]; then
+    echo "$(date -Is) external dead (alive=$alive/4) but reconnected <30min ago, skip" >> $LOG
+    exit 0
+  fi
+  echo "$now" > "$STATE"
+  echo "$(date -Is) gateway OK but external dead (alive=$alive/4) -> wlan0 reconnect" >> $LOG
+  nmcli dev disconnect wlan0
+  sleep 3
+  nmcli dev connect wlan0
+fi
+exit 0
+```
+
+設計のポイント：
+
+- 4つの独立した宛先のうち **2つ以上生きていれば正常扱い**（1サイトの障害だけでは誤発火しない）
+- `https://1.1.1.1` は IP 直打ちなので **DNS が死んでいても機能する probe**
+- 再接続は **30分クールダウン**付き（フラッピング防止）
+- 正常時に手で実行して「何もしない」ことを確認してから cron に載せる（v1 と同じ）
+
+### 続編の教訓
+
+- gateway ping 監視だけでは「Wi-Fi クライアント状態の破損による選択的な断」を見逃す
+- 「一部のサイトだけ通る」は ISP 障害に見えて、**機器側の可能性がある**。同一 LAN の別端末から同じ宛先を叩く cross-check が最速の切り分け
+- `nmcli dev reapply` と「完全再接続（disconnect/connect）」は別物。直らないときは完全再接続まで落とす
