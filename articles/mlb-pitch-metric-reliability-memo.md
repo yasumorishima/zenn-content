@@ -41,4 +41,5 @@ published: false
 ## 再現
 
 集計は dbt の 1 モデルで、別の書き方で全セルを計算し直すテストが付いています（球種をまたいで組を作る・球種内の平均を引き忘れる、などの誤りを入れると落ちることを確認済み）。
+dbt とは別に、Savant の元の表から pandas で 20 個の相関と組の数を計算し直し、公開している表と一致することも確かめました。
 https://github.com/yasumorishima/mlb-data-pipeline
