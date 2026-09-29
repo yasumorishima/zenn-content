@@ -3,7 +3,7 @@ title: "球種の成績は翌年も続くのか：MLB 8,022 組で空振り率�
 emoji: "⚾"
 type: "idea"
 topics: ["baseball", "mlb", "statcast", "dbt", "duckdb"]
-published: false
+published: true
 ---
 
 Baseball Savant で球種の成績を見ていて、「去年良かった球種は、今年も良いのか」が気になったので、MLB の公開データで調べてみました。野球の現場の経験者ではなく、公開データを集計しただけです。
