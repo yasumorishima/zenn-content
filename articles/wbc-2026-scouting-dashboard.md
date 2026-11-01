@@ -6,6 +6,10 @@ topics: ["baseball", "kaggle", "streamlit", "python", "データ分析"]
 published: true
 ---
 
+:::message
+2026-11 追記：ダッシュボードは GitHub Pages 版に移しました（サーバーが無く眠りません）→ https://yasumorishima.github.io/wbc-scouting/ 。この記事の Streamlit のリンクも残してあり、眠っていれば起動ボタンで動きます。
+:::
+
 ## 作ったもの
 
 WBC 2026（ワールドベースボールクラシック）に向けて、MLBのStatcastデータを使ったスカウティングツールを3つ作りました。

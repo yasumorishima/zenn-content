@@ -6,6 +6,10 @@ topics: ["streamlit", "playwright", "python", "raspberrypi", "githubactions"]
 published: true
 ---
 
+:::message
+2026-11 追記：この記事で扱った WBC の 37 アプリは、その後 GitHub Pages（stlite＝ブラウザの中で Streamlit を動かす方式）に移し、keepalive の対象から外しました → https://yasumorishima.github.io/wbc-scouting/ 。keepalive はほかの Streamlit アプリ 4 本で今も動いています。
+:::
+
 ## TL;DR
 
 - Streamlit Community Cloud のアプリは一定期間アクセスがないとスリープする（Zzz）

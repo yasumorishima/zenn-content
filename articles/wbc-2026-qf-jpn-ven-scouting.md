@@ -3,8 +3,12 @@ title: "WBC準々決勝 日本vsベネズエラのStatcast分析アプリを作�
 emoji: "⚾"
 type: "tech"
 topics: ["baseball", "streamlit", "statcast", "python", "データ分析"]
-published: false
+published: true
 ---
+
+:::message
+2026-11 追記：このアプリは GitHub Pages 版に移しました（サーバーが無く眠りません。最初の表示は 1〜2 分）→ https://yasumorishima.github.io/wbc-scouting/qf-jpn-ven.html 。この記事の Streamlit のリンクも残してあり、眠っていれば起動ボタンで動きます。
+:::
 
 ## 作ったもの
 
