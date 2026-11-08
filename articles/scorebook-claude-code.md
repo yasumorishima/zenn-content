@@ -3,7 +3,7 @@ title: "草野球のスコアブックを Claude Code に読ませて成績を�
 emoji: "⚾"
 type: "tech"
 topics: ["baseball", "claudecode", "claude", "opencv", "画像処理"]
-published: false
+published: true
 ---
 
 所属している草野球チームでは、試合ごとの成績をチームのサイトに載せています。元になるのは、試合中に書く紙のスコアブックです。これを試合のたびに手で打ち込むのは時間がかかりますし、記号の読み違いも起きます。写真から読めないかと思って試してきて、いまは Claude Code（モデルは Claude Opus 5.5）に写真を読ませ、検算してから登録しています。
