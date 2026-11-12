@@ -3,7 +3,7 @@ title: "Claude Code の SessionStart hook で渡していた 31 万字は、会�
 emoji: "📏"
 type: "tech"
 topics: ["claudecode", "claude", "jq", "awk", "gitbash"]
-published: false
+published: true
 ---
 
 ## きっかけ
