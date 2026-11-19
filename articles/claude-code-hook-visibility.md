@@ -3,7 +3,7 @@ title: "Claude Code に作ってもらった hook の警告が、Claude に届�
 emoji: "🪝"
 type: "tech"
 topics: ["claudecode", "claude", "hooks", "gitbash", "windows"]
-published: false
+published: true
 ---
 
 ## きっかけ
