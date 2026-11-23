@@ -3,7 +3,7 @@ title: "Claude Code の mods を入れる前に調べたこと（備忘録）"
 emoji: "🧩"
 type: "tech"
 topics: ["claudecode", "claude", "plugin", "security"]
-published: false
+published: true
 ---
 
 ## きっかけ
